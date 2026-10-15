@@ -5,12 +5,11 @@ A five-page Garba invitation with a required Yes/No RSVP on Page 2 and an arriva
 ## Live links
 
 - Website: https://dev17122007-afk.github.io/Gr/
-- Google Sheet: https://docs.google.com/spreadsheets/d/1mtoT48c35svVbtLqSI1IXrG059QwXBYd9AhRmRTqkwM/edit
 - Apps Script receiver: https://script.google.com/macros/s/AKfycbwGchWsIGJ5TPb8AuofyCwzCScYJJNW1VyjGQxGPn8CWO9oh25UqwKBtn4rQvjKS29Lkw/exec
 
 ## What gets recorded
 
-The public site sends a response to the Apps Script web app. The Sheet link is stored in the Apps Script project property SPREADSHEET_URL, not in the public site source. Responses are written to a tab named RSVP Responses with columns for received time, browser session ID, Page 2 answer, Page 3 arrival time, Page 3 time choice, and browser submission time.
+The public site sends a response to the Apps Script web app. The Google Sheet link is stored in the Apps Script project property SPREADSHEET_URL and is not included in the public website source or this repository. Responses are written to a tab named RSVP Responses with columns for received time, browser session ID, Page 2 answer, Page 3 arrival time, Page 3 time choice, and browser submission time.
 
 Page 2 records Yes or No. A Yes response must select an arrival time on Page 3 or choose “I’ll let you know soon.” A No response is recorded as an opt-out and does not ask for an arrival time. A later update from the same browser session updates that session’s existing row.
 
