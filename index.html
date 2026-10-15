@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#25102b" />
+  <title>Garba Night? — A little invitation</title>
+  <style>
+    :root { color-scheme:dark; --night:#211027; --plum:#35143d; --pink:#ff8bae; --gold:#ffd77e; --cream:#fff6e8; --muted:#d9bfd5; }
+    * { box-sizing:border-box; }
+    html,body { min-height:100%; margin:0; }
+    body { min-height:100vh; overflow-x:hidden; color:var(--cream); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:radial-gradient(ellipse at 50% 45%,#52204f 0%,#32163b 37%,#211027 76%); }
+    .page { position:relative; display:grid; min-height:100svh; place-items:center; isolation:isolate; overflow:hidden; padding:52px 22px; }
+    .lights { position:absolute; inset:0; z-index:-2; pointer-events:none; background:radial-gradient(ellipse at 14% 20%,rgba(255,183,99,.2),transparent 28%),radial-gradient(ellipse at 86% 72%,rgba(241,88,165,.17),transparent 34%); }
+    .rangoli { position:absolute; top:50%; left:50%; z-index:-1; width:min(112vmin,1000px); aspect-ratio:1; transform:translate(-50%,-50%); opacity:.42; animation:slow-spin 80s linear infinite; }
+    .rangoli svg { width:100%; height:100%; overflow:visible; }
+    .rangoli path,.rangoli circle { fill:none; stroke:#f2ba79; stroke-width:1.1; }
+    .rangoli .petals { stroke:#ff9ab5; stroke-width:1.6; }
+    .rangoli .dots { fill:#ffd77e; stroke:none; }
+    .card { position:relative; width:min(100%,660px); padding:24px clamp(25px,7vw,66px) 31px; border:1px solid rgba(255,221,191,.24); border-radius:32px; background:linear-gradient(155deg,rgba(63,26,67,.9),rgba(39,17,46,.93)); box-shadow:0 28px 100px rgba(10,4,18,.42),inset 0 1px rgba(255,255,255,.08); text-align:center; backdrop-filter:blur(18px); animation:card-in .8s cubic-bezier(.2,.75,.2,1) both; }
+    .progress { display:flex; align-items:center; gap:12px; width:min(100%,330px); margin:0 auto 24px; color:rgba(255,231,215,.6); font-size:9px; font-weight:700; letter-spacing:.17em; }
+    .progress-track { flex:1; height:3px; overflow:hidden; border-radius:4px; background:rgba(255,255,255,.12); }
+    .progress-fill { width:20%; height:100%; border-radius:4px; background:linear-gradient(90deg,#ff9bb7,#ffd77e); transition:width .45s ease; }
+    .step { display:none; }
+    .step.active { display:block; animation:step-in .42s cubic-bezier(.2,.7,.2,1) both; }
+    .eyebrow { display:flex; align-items:center; justify-content:center; gap:12px; margin:0 0 17px; color:#f6c98c; font-size:10px; font-weight:700; letter-spacing:.24em; text-transform:uppercase; }
+    .eyebrow::before,.eyebrow::after { content:"✦"; color:#ff98b4; font-size:12px; }
+    h1 { margin:0; font:400 clamp(38px,7.6vw,63px)/1.02 "Iowan Old Style","Palatino Linotype",Georgia,serif; letter-spacing:-.045em; }
+    h1 em { color:#ff9eb8; font-weight:400; }
+    .illustration { display:grid; place-items:center; width:122px; height:101px; margin:11px auto 5px; }
+    .illustration svg { width:100%; height:100%; overflow:visible; }
+    .stick { transform-box:fill-box; transform-origin:center; animation:stick-sway 3.8s ease-in-out infinite; }
+    .stick.right { animation-delay:-1.9s; }
+    .spark { animation:twinkle 2.4s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+    .spark.delay { animation-delay:.8s; }
+    .copy { max-width:440px; margin:10px auto 0; color:var(--muted); font-size:clamp(14px,2vw,15px); line-height:1.75; }
+    .choice-row { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:15px; margin-top:23px; }
+    button,input { font:inherit; }
+    button { cursor:pointer; }
+    .choice { min-height:46px; padding:12px 19px; border-radius:999px; font-size:13px; transition:transform .22s,box-shadow .22s,background .22s,border-color .22s; }
+    .choice:hover { transform:translateY(-2px); }
+    .choice:focus-visible,.nav-button:focus-visible,.later:focus-visible { outline:2px solid var(--gold); outline-offset:4px; }
+    .yes { border:1px solid #ffd987; background:linear-gradient(135deg,#ffcf7d,#ff9b8f); color:#401c36; font-weight:750; box-shadow:0 8px 24px rgba(255,153,132,.18); }
+    .yes:hover { box-shadow:0 12px 30px rgba(255,153,132,.32); }
+    .no-zone { position:relative; width:224px; height:86px; overflow:hidden; }
+    .no { position:absolute; top:50%; left:50%; min-width:88px; transform:translate(-50%,-50%); border:1px solid rgba(255,231,221,.28); background:rgba(255,255,255,.055); color:#ffeff1; white-space:nowrap; transition:left .28s cubic-bezier(.2,.8,.2,1),top .28s cubic-bezier(.2,.8,.2,1),transform .25s,background .2s; }
+    .no:hover { background:rgba(255,255,255,.11); }
+    .no-hint { min-height:20px; margin:1px 0 0; color:#ffb7c6; font-size:12px; }
+    .details { display:grid; grid-template-columns:1fr 1fr; gap:10px; max-width:410px; margin:22px auto 0; }
+    .detail { padding:13px 12px; border:1px solid rgba(255,215,126,.19); border-radius:16px; background:rgba(255,215,126,.055); }
+    .detail span { display:block; margin-bottom:6px; color:#eabf92; font-size:9px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; }
+    .detail strong { color:#fff1e1; font-size:13px; font-weight:550; }
+    .time-label { display:block; margin:20px 0 8px; color:#f7d7c9; font-size:12px; }
+    .time-wrap { display:flex; justify-content:center; }
+    input[type="time"] { width:178px; padding:12px 15px; border:1px solid rgba(255,215,126,.32); border-radius:14px; outline:none; background:rgba(255,255,255,.075); color:var(--cream); color-scheme:dark; font-size:16px; }
+    input[type="time"]:focus { border-color:#ffd77e; box-shadow:0 0 0 3px rgba(255,215,126,.12); }
+    .later { margin-top:11px; padding:8px 10px; border:0; background:none; color:#f4c8d3; font-size:12px; text-decoration:underline; text-decoration-color:rgba(244,200,211,.4); text-underline-offset:3px; }
+    .page-actions { display:flex; justify-content:center; gap:11px; margin-top:24px; }
+    .nav-button { min-height:44px; padding:11px 18px; border:1px solid rgba(255,231,221,.24); border-radius:999px; background:rgba(255,255,255,.055); color:#ffeff1; font-size:12px; transition:transform .2s,background .2s; }
+    .nav-button:hover { transform:translateY(-2px); background:rgba(255,255,255,.1); }
+    .nav-button.primary { border-color:#ffd987; background:linear-gradient(135deg,#ffcf7d,#ff9b8f); color:#401c36; font-weight:750; }
+    .note { margin:18px 0 0; color:rgba(255,236,240,.52); font-size:11px; letter-spacing:.03em; }
+    .footer { position:absolute; bottom:17px; left:50%; transform:translateX(-50%); width:max-content; max-width:90vw; color:rgba(255,231,215,.42); font-size:9px; letter-spacing:.19em; text-transform:uppercase; }
+    .response { position:fixed; inset:0; z-index:5; display:grid; place-items:center; padding:20px; background:rgba(18,8,23,.72); backdrop-filter:blur(12px); opacity:0; visibility:hidden; transition:opacity .35s,visibility .35s; }
+    .response.show { opacity:1; visibility:visible; }
+    .response-card { width:min(100%,440px); padding:38px 28px 30px; border:1px solid rgba(255,215,126,.3); border-radius:26px; background:linear-gradient(145deg,#452047,#28142e); text-align:center; box-shadow:0 22px 80px rgba(0,0,0,.45); transform:translateY(12px) scale(.98); transition:transform .4s cubic-bezier(.2,.75,.2,1); }
+    .response.show .response-card { transform:none; }
+    .response-icon { font-size:36px; }
+    .response-card h2 { margin:14px 0 10px; font:400 clamp(30px,7vw,42px)/1.05 "Iowan Old Style","Palatino Linotype",Georgia,serif; }
+    .response-card p { margin:0; color:var(--muted); line-height:1.7; font-size:14px; }
+    .back { margin-top:23px; padding:10px 15px; border:0; border-radius:999px; background:rgba(255,255,255,.08); color:var(--cream); font-size:12px; }
+    .confetti { position:fixed; z-index:6; top:-18px; width:9px; height:15px; pointer-events:none; border-radius:3px; animation:fall var(--duration,3s) var(--delay,0s) ease-in forwards; }
+    @keyframes card-in { from { opacity:0; transform:translateY(16px) scale(.985); } to { opacity:1; transform:translateY(0) scale(1); } }
+    @keyframes step-in { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes slow-spin { to { transform:translate(-50%,-50%) rotate(360deg); } }
+    @keyframes stick-sway { 0%,100% { transform:rotate(-7deg) translateY(0); } 50% { transform:rotate(7deg) translateY(-3px); } }
+    @keyframes twinkle { 0%,100% { opacity:.45; transform:scale(.8); } 50% { opacity:1; } }
+    @keyframes fall { to { transform:translate3d(var(--drift,30px),110vh,0) rotate(720deg); opacity:.1; } }
+    @media (max-width:560px) { .page { padding:24px 17px 45px; } .card { border-radius:26px; padding:21px 20px 26px; } .progress { margin-bottom:22px; } .illustration { width:105px; height:87px; margin:8px auto 2px; } .choice-row { gap:5px; flex-direction:column; } .no-zone { width:min(100%,250px); height:76px; } .details { gap:8px; } .detail { padding:12px 9px; } .detail strong { font-size:12px; } .footer { bottom:11px; font-size:8px; } }
+    @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; animation-iteration-count:1!important; scroll-behavior:auto!important; transition-duration:.01ms!important; } }
+    .intro-screen { position:fixed; inset:0; z-index:20; display:grid; place-items:center; overflow:hidden; background:radial-gradient(ellipse at 50% 48%,#55234e 0%,#35163f 40%,#211027 82%); opacity:1; visibility:visible; transition:opacity .65s ease,visibility .65s ease; }
+    .intro-screen.leaving { opacity:0; visibility:hidden; pointer-events:none; }
+    .intro-screen[hidden] { display:none; }
+    .intro-halo { position:absolute; inset:-15%; pointer-events:none; background:radial-gradient(ellipse at 50% 65%,rgba(255,143,188,.17),transparent 35%),radial-gradient(ellipse at 50% 10%,rgba(255,215,126,.11),transparent 38%); }
+    .intro-rangoli { position:absolute; left:50%; top:48%; width:min(115vmin,1050px); aspect-ratio:1; transform:translate(-50%,-50%); opacity:.17; animation:slow-spin 100s linear infinite; }
+    .intro-rangoli svg { width:100%; height:100%; }
+    .intro-rangoli circle,.intro-rangoli path { fill:none; stroke:#f2c47f; stroke-width:1.2; }
+    .intro-art { position:absolute; left:50%; bottom:-3vh; width:min(108vw,105vh); height:min(78vh,790px); transform:translateX(-50%); pointer-events:none; }
+    .intro-art svg { width:100%; height:100%; overflow:visible; }
+    .intro-vine { fill:none; stroke:url(#intro-gold); stroke-width:2.4; stroke-linecap:round; stroke-dasharray:1000; stroke-dashoffset:1000; filter:url(#intro-glow); animation:intro-draw 3.7s var(--delay,.4s) cubic-bezier(.45,.04,.25,1) forwards; }
+    .intro-bloom { fill:url(#intro-petal-fill); fill-opacity:0; stroke:url(#intro-petal-line); stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:1000; stroke-dashoffset:1000; filter:url(#intro-glow); animation:intro-draw 2.7s var(--delay,.6s) cubic-bezier(.45,.04,.25,1) forwards,intro-fill 1.15s calc(var(--delay,.6s) + 1.3s) ease forwards; }
+    .intro-bloom.fine { stroke-width:1.2; }
+    .intro-center { fill:url(#intro-center-fill); opacity:0; filter:url(#intro-glow); animation:intro-center 1s 2.8s cubic-bezier(.2,.8,.25,1.2) forwards; }
+    .intro-stamen { fill:#ffe8a8; opacity:0; filter:url(#intro-glow); animation:intro-center .7s var(--delay,3s) ease forwards,intro-twinkle 2.8s calc(var(--delay,3s) + .7s) ease-in-out infinite; }
+    .intro-copy { position:absolute; z-index:1; top:clamp(48px,9vh,88px); left:20px; right:20px; text-align:center; animation:intro-copy-in .9s .2s ease both; }
+    .intro-kicker { margin:0 0 12px; color:#f7d293; font-size:10px; font-weight:700; letter-spacing:.25em; text-transform:uppercase; }
+    .intro-copy h1 { margin:0; color:#fff8ed; font:400 clamp(48px,9vw,82px)/.96 "Iowan Old Style","Palatino Linotype",Georgia,serif; letter-spacing:-.05em; text-shadow:0 2px 30px rgba(255,195,221,.16); }
+    .intro-copy h1 span { color:#ffabc6; }
+    .intro-subtitle { margin:13px 0 0; color:rgba(255,232,237,.78); font-family:"Iowan Old Style","Palatino Linotype",Georgia,serif; font-size:clamp(13px,2vw,17px); font-style:italic; letter-spacing:.08em; }
+    .intro-button { position:absolute; z-index:2; bottom:clamp(27px,7vh,60px); left:50%; transform:translateX(-50%); min-height:50px; padding:14px 23px; border:1px solid #ffd987; border-radius:999px; background:linear-gradient(135deg,#ffcf7d,#ff9b9c); color:#401c36; font-size:13px; font-weight:750; white-space:nowrap; box-shadow:0 9px 32px rgba(255,153,163,.2); cursor:pointer; transition:transform .22s,box-shadow .22s; animation:intro-copy-in .8s 1s ease both; }
+    .intro-button:hover { transform:translateX(-50%) translateY(-2px); box-shadow:0 14px 36px rgba(255,153,163,.33); }
+    .intro-button:focus-visible { outline:2px solid #fff0bd; outline-offset:5px; }
+    @keyframes intro-draw { to { stroke-dashoffset:0; } }
+    @keyframes intro-fill { to { fill-opacity:.68; } }
+    @keyframes intro-center { from { opacity:0; transform:scale(.35); } to { opacity:1; transform:scale(1); } }
+    @keyframes intro-twinkle { 0%,100% { opacity:.35; } 50% { opacity:1; } }
+    @keyframes intro-copy-in { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="lights" aria-hidden="true"></div>
+    <div class="rangoli" aria-hidden="true">
+      <svg viewBox="0 0 500 500">
+        <circle cx="250" cy="250" r="170"/><circle cx="250" cy="250" r="190"/><circle cx="250" cy="250" r="220"/>
+        <g class="petals">
+          <path d="M250 57 C292 121 292 169 250 209 C208 169 208 121 250 57Z"/><path d="M250 57 C292 121 292 169 250 209 C208 169 208 121 250 57Z" transform="rotate(45 250 250)"/><path d="M250 57 C292 121 292 169 250 209 C208 169 208 121 250 57Z" transform="rotate(90 250 250)"/><path d="M250 57 C292 121 292 169 250 209 C208 169 208 121 250 57Z" transform="rotate(135 250 250)"/><path d="M250 57 C292 121 292 169 250 209 C208 169 208 121 250 57Z" transform="rotate(180 250 250)"/><path d="M250 57 C292 121 292 169 250 209 C208 169 208 121 250 57Z" transform="rotate(225 250 250)"/><path d="M250 57 C292 121 292 169 250 209 C208 169 208 121 250 57Z" transform="rotate(270 250 250)"/><path d="M250 57 C292 121 292 169 250 209 C208 169 208 121 250 57Z" transform="rotate(315 250 250)"/>
+        </g>
+        <g class="dots"><circle cx="250" cy="38" r="3"/><circle cx="250" cy="462" r="3"/><circle cx="38" cy="250" r="3"/><circle cx="462" cy="250" r="3"/><circle cx="100" cy="100" r="2.5"/><circle cx="400" cy="100" r="2.5"/><circle cx="100" cy="400" r="2.5"/><circle cx="400" cy="400" r="2.5"/></g>
+      </svg>
+    </div>
+    <section class="card" aria-label="Garba night invitation">
+      <div class="progress" aria-label="Invitation page 1 of 5"><span id="step-label">01 / 05</span><div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div></div>
+
+      <!-- STEP 1 -->
+      <section class="step active" id="step-1" aria-labelledby="question-title">
+        <p class="eyebrow">A little festive invitation</p>
+        <h1 id="question-title">Are you coming<br>to <em>Garba night?</em></h1>
+        <div class="illustration" aria-hidden="true">
+          <svg viewBox="0 0 160 125">
+            <path class="stick" d="M42 102 L106 25" stroke="#ffcf7d" stroke-width="9" stroke-linecap="round"/><path class="stick right" d="M118 103 L54 25" stroke="#ff8bae" stroke-width="9" stroke-linecap="round"/>
+            <path d="M55 83 L66 70 M94 70 L105 83" stroke="#fff0bd" stroke-width="3" stroke-linecap="round" opacity=".9"/>
+            <path class="spark" d="M80 8 L84 18 L94 22 L84 26 L80 36 L76 26 L66 22 L76 18Z" fill="#ffe6a3"/><circle class="spark delay" cx="29" cy="43" r="3" fill="#ff9cb1"/><circle class="spark" cx="133" cy="50" r="2.5" fill="#ffdd8d"/>
+          </svg>
+        </div>
+        <p class="copy">Come twirl through a night of music, colors, and dandiya with me?</p>
+        <div class="choice-row">
+          <button class="choice yes" id="yes-button" type="button">Yes! Let’s go 💃</button>
+          <div class="no-zone" id="no-zone"><button class="choice no" id="no-button" type="button">No 🙈</button></div>
+        </div>
+        <p class="no-hint" id="no-hint" aria-live="polite"></p>
+      </section>
+
+      <!-- STEP 2 -->
+      <section class="step" id="step-2" aria-labelledby="no-pressure-title" aria-hidden="true">
+        <p class="eyebrow">One gentle reminder</p>
+        <h1 id="no-pressure-title">No pressure,<br><em>promise.</em></h1>
+        <p class="copy">If you don’t feel like joining, or the timing doesn’t work, that’s completely okay. Please feel free to say no — I’ll understand. I’m glad I asked either way. 💛</p>
+        <p class="note">You don’t have to explain or decide right now.</p>
+        <div class="page-actions">
+          <button class="nav-button" data-back="0" type="button">← Back</button>
+          <button class="nav-button primary" id="join-after-reassurance" type="button">I’d love to join →</button>
+        </div>
+        <button class="later" id="pass-button" type="button">I’ll pass this time, thank you</button>
+      </section>
+
+      <!-- STEP 3 -->
+      <section class="step" id="step-3" aria-labelledby="time-title" aria-hidden="true">
+        <p class="eyebrow">One little detail</p>
+        <h1 id="time-title">What time are<br>you <em>joining?</em></h1>
+        <p class="copy">Pick a time that works for you. We can figure out the rest together.</p>
+        <label class="time-label" for="arrival-time">Your arrival time</label>
+        <div class="time-wrap"><input id="arrival-time" type="time" /></div>
+        <button class="later" id="later-button" type="button">I’ll let you know soon</button>
+        <div class="page-actions">
+          <button class="nav-button" data-back="1" type="button">← Back</button>
+          <button class="nav-button primary" id="time-next" type="button">Continue →</button>
+        </div>
+      </section>
+
+      <!-- STEP 4 -->
+      <section class="step" id="step-4" aria-labelledby="invite-title" aria-hidden="true">
+        <p class="eyebrow">Your official invitation</p>
+        <h1 id="invite-title">You’re invited to<br><em>Garba night!</em></h1>
+        <div class="illustration" aria-hidden="true">
+          <svg viewBox="0 0 160 125">
+            <path class="stick" d="M42 102 L106 25" stroke="#ffcf7d" stroke-width="9" stroke-linecap="round"/><path class="stick right" d="M118 103 L54 25" stroke="#ff8bae" stroke-width="9" stroke-linecap="round"/>
+            <path d="M55 83 L66 70 M94 70 L105 83" stroke="#fff0bd" stroke-width="3" stroke-linecap="round" opacity=".9"/>
+            <path class="spark" d="M80 8 L84 18 L94 22 L84 26 L80 36 L76 26 L66 22 L76 18Z" fill="#ffe6a3"/><circle class="spark delay" cx="29" cy="43" r="3" fill="#ff9cb1"/><circle class="spark" cx="133" cy="50" r="2.5" fill="#ffdd8d"/>
+          </svg>
+        </div>
+        <p class="copy">An evening of dandiya, music, colors, and a dance saved just for you.</p>
+        <div class="details">
+          <div class="detail"><span>When</span><strong id="invite-time">We’ll choose together</strong></div>
+          <div class="detail"><span>Where</span><strong>Let’s pick a place</strong></div>
+        </div>
+        <p class="note">Your outfit: festive. My plan: save you a dance.</p>
+        <div class="page-actions">
+          <button class="nav-button" data-back="2" type="button">← Back</button>
+          <button class="nav-button primary" data-next="4" type="button">One last thing →</button>
+        </div>
+      </section>
+
+      <!-- STEP 5 -->
+      <section class="step" id="step-5" aria-labelledby="flirty-title" aria-hidden="true">
+        <p class="eyebrow">A tiny confession</p>
+        <div class="response-icon" aria-hidden="true">✨💖✨</div>
+        <h1 id="flirty-title">The best part<br>might be <em>you.</em></h1>
+        <p class="copy">I’m excited for the music and dandiya, but getting to spend the evening with you might be my favorite part. Save me a dance? 😉</p>
+        <div class="page-actions">
+          <button class="nav-button" data-back="3" type="button">← Back</button>
+          <button class="nav-button primary" id="finish-button" type="button">Can’t wait 💖</button>
+        </div>
+      </section>
+    </section>
+    <div class="footer">dandiya, twirls &amp; a little magic</div>
+  </main>
+
+  <!-- INTRO SCREEN -->
+  <section class="intro-screen" id="intro-screen" aria-label="Garba invitation introduction">
+    <div class="intro-halo" aria-hidden="true"></div>
+    <div class="intro-rangoli" aria-hidden="true">
+      <svg viewBox="0 0 500 500"><circle cx="250" cy="250" r="170"/><circle cx="250" cy="250" r="197"/><circle cx="250" cy="250" r="224"/><g>
+        <path d="M250 47 C290 112 290 166 250 208 C210 166 210 112 250 47Z"/><path d="M250 47 C290 112 290 166 250 208 C210 166 210 112 250 47Z" transform="rotate(45 250 250)"/><path d="M250 47 C290 112 290 166 250 208 C210 166 210 112 250 47Z" transform="rotate(90 250 250)"/><path d="M250 47 C290 112 290 166 250 208 C210 166 210 112 250 47Z" transform="rotate(135 250 250)"/><path d="M250 47 C290 112 290 166 250 208 C210 166 210 112 250 47Z" transform="rotate(180 250 250)"/><path d="M250 47 C290 112 290 166 250 208 C210 166 210 112 250 47Z" transform="rotate(225 250 250)"/><path d="M250 47 C290 112 290 166 250 208 C210 166 210 112 250 47Z" transform="rotate(270 250 250)"/><path d="M250 47 C290 112 290 166 250 208 C210 166 210 112 250 47Z" transform="rotate(315 250 250)"/>
+      </g></svg>
+    </div>
+    <div class="intro-art" aria-hidden="true">
+      <svg viewBox="0 0 1000 850" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="intro-gold" x1="0" y1="1" x2="1" y2="0"><stop stop-color="#96632f"/><stop offset=".48" stop-color="#f5d28c"/><stop offset=".72" stop-color="#fff0c4"/><stop offset="1" stop-color="#bd8746"/></linearGradient>
+          <linearGradient id="intro-petal-fill" x1=".15" y1=".1" x2=".82" y2="1"><stop stop-color="#fff3f8"/><stop offset=".32" stop-color="#f4a9d1"/><stop offset=".72" stop-color="#d66da8"/><stop offset="1" stop-color="#7f2d6c"/></linearGradient>
+          <linearGradient id="intro-petal-line" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fffafd"/><stop offset=".5" stop-color="#ffcce8"/><stop offset="1" stop-color="#df83bb"/></linearGradient>
+          <radialGradient id="intro-center-fill"><stop stop-color="#fff5c9"/><stop offset=".42" stop-color="#ffd989" stop-opacity=".95"/><stop offset="1" stop-color="#ee9f71" stop-opacity=".1"/></radialGradient>
+          <filter id="intro-glow" x="-35%" y="-35%" width="170%" height="170%"><feGaussianBlur stdDeviation="3.5" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <path class="intro-vine" style="--delay:.1s" pathLength="1000" d="M130 810 C170 710 244 719 224 631 C210 568 143 579 163 504 C181 441 264 446 249 371 C238 316 184 314 204 246 C216 205 260 203 280 237 C300 270 274 301 251 292" />
+        <path class="intro-vine" style="--delay:.35s" pathLength="1000" d="M870 810 C830 710 756 719 776 631 C790 568 857 579 837 504 C819 441 736 446 751 371 C762 316 816 314 796 246 C784 205 740 203 720 237 C700 270 726 301 749 292" />
+        <path class="intro-bloom" style="--delay:.6s" pathLength="1000" d="M500 682 C430 617 298 565 159 548 C221 665 363 721 500 704 C637 721 779 665 841 548 C702 565 570 617 500 682Z" />
+        <path class="intro-bloom" style="--delay:.8s" pathLength="1000" d="M500 657 C406 565 293 474 185 402 C184 530 301 640 500 688 C699 640 816 530 815 402 C707 474 594 565 500 657Z" />
+        <path class="intro-bloom" style="--delay:1s" pathLength="1000" d="M500 645 C389 548 305 391 292 277 C420 337 486 472 500 645Z" />
+        <path class="intro-bloom" style="--delay:1.15s" pathLength="1000" d="M500 645 C611 548 695 391 708 277 C580 337 514 472 500 645Z" />
+        <path class="intro-bloom" style="--delay:1.3s" pathLength="1000" d="M500 636 C430 534 417 384 500 205 C583 384 570 534 500 636Z" />
+        <path class="intro-bloom" style="--delay:1.45s" pathLength="1000" d="M500 666 C454 582 379 532 325 532 C359 610 420 659 500 686Z" />
+        <path class="intro-bloom" style="--delay:1.55s" pathLength="1000" d="M500 666 C546 582 621 532 675 532 C641 610 580 659 500 686Z" />
+        <path class="intro-bloom fine" style="--delay:1.7s" pathLength="1000" d="M500 633 C482 523 473 384 500 246 C527 384 518 523 500 633Z" />
+        <path class="intro-bloom fine" style="--delay:1.82s" pathLength="1000" d="M500 646 C445 538 366 441 316 342 C423 398 478 506 500 646Z" />
+        <path class="intro-bloom fine" style="--delay:1.95s" pathLength="1000" d="M500 646 C555 538 634 441 684 342 C577 398 522 506 500 646Z" />
+        <ellipse class="intro-center" cx="500" cy="620" rx="88" ry="76" />
+        <circle class="intro-stamen" style="--delay:2.8s" cx="500" cy="580" r="4.2"/><circle class="intro-stamen" style="--delay:2.9s" cx="480" cy="589" r="3.1"/><circle class="intro-stamen" style="--delay:3s" cx="520" cy="589" r="3.1"/><circle class="intro-stamen" style="--delay:3.1s" cx="463" cy="603" r="2.5"/><circle class="intro-stamen" style="--delay:3.2s" cx="537" cy="603" r="2.5"/><circle class="intro-stamen" style="--delay:3.3s" cx="490" cy="570" r="2.6"/><circle class="intro-stamen" style="--delay:3.4s" cx="510" cy="570" r="2.6"/>
+      </svg>
+    </div>
+    <div class="intro-copy"><p class="intro-kicker">A little invitation</p><h1>For <span>You ✨</span></h1><p class="intro-subtitle">A little lotus, a little sparkle, and one question for you.</p></div>
+    <button class="intro-button" id="start-invitation" type="button">Open your invitation &nbsp;→</button>
+  </section>
+
+  <!-- RESPONSE MODAL -->
+  <section class="response" id="response" role="dialog" aria-modal="true" aria-labelledby="response-title" aria-hidden="true">
+    <div class="response-card"><div class="response-icon" id="response-icon" aria-hidden="true">💖</div><h2 id="response-title">You just made my night!</h2><p id="response-copy">Now counting down to our Garba date. ✨</p><button class="back" id="close-response" type="button">Back to the invite</button></div>
+  </section>
+
+  <script>
+    // Paste your Google Apps Script Web App URL here:
+    const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+
+    const steps = [...document.querySelectorAll('.step')];
+    const introScreen = document.getElementById('intro-screen');
+    
+    document.getElementById('start-invitation').addEventListener('click', () => {
+      introScreen.classList.add('leaving');
+      window.setTimeout(() => {
+        introScreen.hidden = true;
+        document.getElementById('yes-button').focus();
+      }, 680);
+    });
+
+    const stepLabel = document.getElementById('step-label');
+    const progressFill = document.getElementById('progress-fill');
+    const arrivalTime = document.getElementById('arrival-time');
+    const inviteTime = document.getElementById('invite-time');
+    let currentStep = 0;
+    let choseLater = false;
+
+    function showStep(index) {
+      currentStep = index;
+      steps.forEach((step, i) => {
+        step.classList.toggle('active', i === index);
+        step.setAttribute('aria-hidden', i === index ? 'false' : 'true');
+      });
+      stepLabel.textContent = `${String(index + 1).padStart(2, '0')} / ${String(steps.length).padStart(2, '0')}`;
+      progressFill.style.width = `${((index + 1) / steps.length) * 100}%`;
+      document.querySelector('.progress').setAttribute('aria-label', `Invitation page ${index + 1} of 5`);
+      if (index === 3) updateInviteTime();
+    }
+
+    function updateInviteTime() {
+      if (choseLater || !arrivalTime.value) {
+        inviteTime.textContent = 'We’ll choose together';
+        return;
+      }
+      const [hourText, minuteText] = arrivalTime.value.split(':');
+      const hour = Number(hourText);
+      const suffix = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12;
+      inviteTime.textContent = `${hour12}:${minuteText} ${suffix}`;
+    }
+
+    // Helper function to send payload to Google Sheets
+    function sendToGoogleSheet(payload) {
+      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") return;
+
+      fetch(GOOGLE_SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).catch(err => console.error("Error logging to Google Sheet:", err));
+    }
+
+    // Navigation event listeners
+    document.getElementById('yes-button').addEventListener('click', () => showStep(1));
+    document.getElementById('join-after-reassurance').addEventListener('click', () => showStep(2));
+    
+    document.getElementById('time-next').addEventListener('click', () => {
+      sendToGoogleSheet({
+        event: "time_selected",
+        time: arrivalTime.value || null,
+        choseLater: choseLater
+      });
+      showStep(3);
+    });
+
+    document.querySelectorAll('[data-back]').forEach(button => {
+      button.addEventListener('click', () => showStep(Number(button.dataset.back)));
+    });
+    document.querySelectorAll('[data-next]').forEach(button => {
+      button.addEventListener('click', () => showStep(Number(button.dataset.next)));
+    });
+
+    arrivalTime.addEventListener('input', () => { choseLater = false; });
+    
+    document.getElementById('later-button').addEventListener('click', () => {
+      choseLater = true;
+      arrivalTime.value = '';
+      sendToGoogleSheet({
+        event: "time_selected",
+        time: null,
+        choseLater: true
+      });
+      showStep(3);
+    });
+
+    // "No" button playful movement
+    const noButton = document.getElementById('no-button');
+    const noZone = document.getElementById('no-zone');
+    const noHint = document.getElementById('no-hint');
+    let noCount = 0;
+    const noLabels = ['Wait, reconsider? 😅','One little twirl?','Catch me first!','Just one dance?','Still floating away!'];
+    
+    noButton.addEventListener('click', () => {
+      noCount += 1;
+      if (noCount >= 3) {
+        showStep(1);
+        return;
+      }
+      const maxX = Math.max(0, noZone.clientWidth - noButton.offsetWidth);
+      const maxY = Math.max(0, noZone.clientHeight - noButton.offsetHeight);
+      noButton.style.transform = 'none';
+      noButton.style.left = `${Math.random() * maxX}px`;
+      noButton.style.top = `${Math.random() * maxY}px`;
+      noButton.textContent = noLabels[(noCount - 1) % noLabels.length];
+      noHint.textContent = 'The “No” button has a mind of its own…';
+    });
+
+    // Response Modal & Confetti
+    const response = document.getElementById('response');
+    const finish = document.getElementById('finish-button');
+    const passButton = document.getElementById('pass-button');
+    const responseTitle = document.getElementById('response-title');
+    const responseCopy = document.getElementById('response-copy');
+    const responseIcon = document.getElementById('response-icon');
+    let responseFrom = 'finish';
+
+    function tossConfetti() {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      const colors = ['#ffd77e','#ff8bae','#f8e2ad','#cf9cff','#ffb37e'];
+      for (let i = 0; i < 32; i++) {
+        const bit = document.createElement('span');
+        bit.className = 'confetti';
+        bit.style.left = `${Math.random() * 100}vw`;
+        bit.style.backgroundColor = colors[i % colors.length];
+        bit.style.setProperty('--delay', `${Math.random() * .55}s`);
+        bit.style.setProperty('--duration', `${2.4 + Math.random() * 1.5}s`);
+        bit.style.setProperty('--drift', `${Math.random() * 150 - 75}px`);
+        document.body.appendChild(bit);
+        window.setTimeout(() => bit.remove(), 4500);
+      }
+    }
+
+    function openResponse(kind) {
+      responseFrom = kind;
+      const isPass = kind === 'pass';
+      
+      // Send Google Sheet event if opted out on Step 2
+      if (isPass) {
+        sendToGoogleSheet({
+          event: "pass"
+        });
+      }
+
+      responseTitle.textContent = isPass ? 'Thanks for letting me know' : 'You just made my night!';
+      responseCopy.textContent = isPass ? 'No pressure at all. I hope you have a lovely night, and there’s no need to explain. 💛' : 'Now counting down to our Garba date. ✨';
+      responseIcon.textContent = isPass ? '💛' : '💖';
+      response.classList.add('show');
+      response.setAttribute('aria-hidden','false');
+      document.getElementById('close-response').focus();
+      if (!isPass) tossConfetti();
+    }
+
+    function closeResponse() {
+      response.classList.remove('show');
+      response.setAttribute('aria-hidden','true');
+      (responseFrom === 'pass' ? passButton : finish).focus();
+    }
+
+    finish.addEventListener('click', () => openResponse('finish'));
+    passButton.addEventListener('click', () => openResponse('pass'));
+    document.getElementById('close-response').addEventListener('click', closeResponse);
+    response.addEventListener('click', event => { if (event.target === response) closeResponse(); });
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && response.classList.contains('show')) closeResponse(); });
+  </script>
+</body>
+</html>
