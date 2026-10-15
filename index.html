@@ -257,19 +257,12 @@
     // The Sheet URL is kept in Apps Script Script Properties as SPREADSHEET_URL.
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwGchWsIGJ5TPb8AuofyCwzCScYJJNW1VyjGQxGPn8CWO9oh25UqwKBtn4rQvjKS29Lkw/exec";
     const GOOGLE_SCRIPT_PLACEHOLDER = "PASTE_WEB_APP_URL_HERE";
-    const sessionId = (() => {
-      const key = "garba_rsvp_session_id";
-      try {
-        let id = localStorage.getItem(key);
-        if (!id) {
-          id = "sess_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
-          localStorage.setItem(key, id);
-        }
-        return id;
-      } catch {
-        return "sess_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
-      }
-    })();
+    function createSubmissionId() {
+      const uniquePart = window.crypto?.randomUUID
+        ? window.crypto.randomUUID()
+        : Math.random().toString(36).slice(2) + Date.now().toString(36);
+      return `rsvp_${uniquePart}`;
+    }
 
     const steps = [...document.querySelectorAll('.step')];
     const introScreen = document.getElementById('intro-screen');
@@ -344,8 +337,10 @@
       const timeStatus = attendance === "no"
         ? "not_applicable"
         : choseLater ? "will_confirm_later" : hasTime ? "entered" : "not_provided";
+      const submissionId = createSubmissionId();
       sendToGoogleSheet({
-        sessionId,
+        sessionId: submissionId,
+        submissionId,
         response: attendance,
         arrivalTime: attendance === "yes" && hasTime ? arrivalTime.value : "",
         timeStatus,
