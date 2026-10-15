@@ -42,6 +42,8 @@
     .choice:focus-visible,.nav-button:focus-visible,.later:focus-visible { outline:2px solid var(--gold); outline-offset:4px; }
     .yes { border:1px solid #ffd987; background:linear-gradient(135deg,#ffcf7d,#ff9b8f); color:#401c36; font-weight:750; box-shadow:0 8px 24px rgba(255,153,132,.18); }
     .yes:hover { box-shadow:0 12px 30px rgba(255,153,132,.32); }
+    .choice.opt-out { border:1px solid rgba(255,231,221,.28); background:rgba(255,255,255,.055); color:#ffeff1; }
+    .choice.opt-out:hover { background:rgba(255,255,255,.11); }
     .no-zone { position:relative; width:224px; height:86px; overflow:hidden; }
     .no { position:absolute; top:50%; left:50%; min-width:88px; transform:translate(-50%,-50%); border:1px solid rgba(255,231,221,.28); background:rgba(255,255,255,.055); color:#ffeff1; white-space:nowrap; transition:left .28s cubic-bezier(.2,.8,.2,1),top .28s cubic-bezier(.2,.8,.2,1),transform .25s,background .2s; }
     .no:hover { background:rgba(255,255,255,.11); }
@@ -55,6 +57,8 @@
     input[type="time"] { width:178px; padding:12px 15px; border:1px solid rgba(255,215,126,.32); border-radius:14px; outline:none; background:rgba(255,255,255,.075); color:var(--cream); color-scheme:dark; font-size:16px; }
     input[type="time"]:focus { border-color:#ffd77e; box-shadow:0 0 0 3px rgba(255,215,126,.12); }
     .later { margin-top:11px; padding:8px 10px; border:0; background:none; color:#f4c8d3; font-size:12px; text-decoration:underline; text-decoration-color:rgba(244,200,211,.4); text-underline-offset:3px; }
+    .later.selected { color:var(--gold); text-decoration-color:var(--gold); }
+    .time-error { color:#ffb7c6; }
     .page-actions { display:flex; justify-content:center; gap:11px; margin-top:24px; }
     .nav-button { min-height:44px; padding:11px 18px; border:1px solid rgba(255,231,221,.24); border-radius:999px; background:rgba(255,255,255,.055); color:#ffeff1; font-size:12px; transition:transform .2s,background .2s; }
     .nav-button:hover { transform:translateY(-2px); background:rgba(255,255,255,.1); }
@@ -125,7 +129,7 @@
       <!-- STEP 1 -->
       <section class="step active" id="step-1" aria-labelledby="question-title">
         <p class="eyebrow">A little festive invitation</p>
-        <h1 id="question-title">Are you coming<br>to <em>Garba night?</em></h1>
+        <h1 id="question-title">A little<br><em>Garba night?</em></h1>
         <div class="illustration" aria-hidden="true">
           <svg viewBox="0 0 160 125">
             <path class="stick" d="M42 102 L106 25" stroke="#ffcf7d" stroke-width="9" stroke-linecap="round"/><path class="stick right" d="M118 103 L54 25" stroke="#ff8bae" stroke-width="9" stroke-linecap="round"/>
@@ -134,24 +138,23 @@
           </svg>
         </div>
         <p class="copy">Come twirl through a night of music, colors, and dandiya with me?</p>
-        <div class="choice-row">
-          <button class="choice yes" id="yes-button" type="button">Yes! Let’s go 💃</button>
-          <div class="no-zone" id="no-zone"><button class="choice no" id="no-button" type="button">No 🙈</button></div>
+        <div class="page-actions">
+          <button class="nav-button primary" id="yes-button" type="button">See RSVP choices →</button>
         </div>
-        <p class="no-hint" id="no-hint" aria-live="polite"></p>
       </section>
 
       <!-- STEP 2 -->
       <section class="step" id="step-2" aria-labelledby="no-pressure-title" aria-hidden="true">
-        <p class="eyebrow">One gentle reminder</p>
-        <h1 id="no-pressure-title">No pressure,<br><em>promise.</em></h1>
-        <p class="copy">If you don’t feel like joining, or the timing doesn’t work, that’s completely okay. Please feel free to say no — I’ll understand. I’m glad I asked either way. 💛</p>
-        <p class="note">You don’t have to explain or decide right now.</p>
+        <p class="eyebrow">Your RSVP</p>
+        <h1 id="no-pressure-title">Are you joining<br><em>Garba night?</em></h1>
+        <p class="copy">Choose Yes if you’re in, or No if you’d like to opt out. Either answer is completely okay.</p>
+        <div class="choice-row">
+          <button class="choice yes" id="join-after-reassurance" type="button">Yes, I’m in 💃</button>
+          <button class="choice opt-out" id="pass-button" type="button">No, I’ll opt out</button>
+        </div>
         <div class="page-actions">
           <button class="nav-button" data-back="0" type="button">← Back</button>
-          <button class="nav-button primary" id="join-after-reassurance" type="button">I’d love to join →</button>
         </div>
-        <button class="later" id="pass-button" type="button">I’ll pass this time, thank you</button>
       </section>
 
       <!-- STEP 3 -->
@@ -160,8 +163,9 @@
         <h1 id="time-title">What time are<br>you <em>joining?</em></h1>
         <p class="copy">Pick a time that works for you. We can figure out the rest together.</p>
         <label class="time-label" for="arrival-time">Your arrival time</label>
-        <div class="time-wrap"><input id="arrival-time" type="time" /></div>
+        <div class="time-wrap"><input id="arrival-time" type="time" aria-describedby="time-error" /></div>
         <button class="later" id="later-button" type="button">I’ll let you know soon</button>
+        <p class="note time-error" id="time-error" role="alert" hidden>Choose a time, or select “I’ll let you know soon.”</p>
         <div class="page-actions">
           <button class="nav-button" data-back="1" type="button">← Back</button>
           <button class="nav-button primary" id="time-next" type="button">Continue →</button>
@@ -249,8 +253,23 @@
   </section>
 
   <script>
-    // Paste your Google Apps Script Web App URL here:
-    const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+    // Paste the deployed Google Apps Script Web App URL here.
+    // The Sheet URL is kept in Apps Script Script Properties as SPREADSHEET_URL.
+    const GOOGLE_SCRIPT_URL = "PASTE_WEB_APP_URL_HERE";
+    const GOOGLE_SCRIPT_PLACEHOLDER = "PASTE_WEB_APP_URL_HERE";
+    const sessionId = (() => {
+      const key = "garba_rsvp_session_id";
+      try {
+        let id = localStorage.getItem(key);
+        if (!id) {
+          id = "sess_" + Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+          localStorage.setItem(key, id);
+        }
+        return id;
+      } catch {
+        return "sess_" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      }
+    })();
 
     const steps = [...document.querySelectorAll('.step')];
     const introScreen = document.getElementById('intro-screen');
@@ -267,7 +286,10 @@
     const progressFill = document.getElementById('progress-fill');
     const arrivalTime = document.getElementById('arrival-time');
     const inviteTime = document.getElementById('invite-time');
+    const laterButton = document.getElementById('later-button');
+    const timeError = document.getElementById('time-error');
     let currentStep = 0;
+    let attendance = "";
     let choseLater = false;
 
     function showStep(index) {
@@ -294,28 +316,57 @@
       inviteTime.textContent = `${hour12}:${minuteText} ${suffix}`;
     }
 
-    // Helper function to send payload to Google Sheets
+    // Send one complete RSVP row. text/plain avoids a cross-origin preflight.
     function sendToGoogleSheet(payload) {
-      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL") return;
-
+      if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL === GOOGLE_SCRIPT_PLACEHOLDER) {
+        console.info("Google Sheets receiver is not configured yet.");
+        return false;
+      }
+      const body = JSON.stringify(payload);
+      if (navigator.sendBeacon) {
+        const queued = navigator.sendBeacon(
+          GOOGLE_SCRIPT_URL,
+          new Blob([body], { type: "text/plain;charset=utf-8" })
+        );
+        if (queued) return true;
+      }
       fetch(GOOGLE_SCRIPT_URL, {
         method: "POST",
         mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      }).catch(err => console.error("Error logging to Google Sheet:", err));
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body
+      }).catch(err => console.error("Could not send RSVP to Google Sheets:", err));
+      return true;
+    }
+
+    function saveResponse() {
+      const hasTime = Boolean(arrivalTime.value);
+      const timeStatus = attendance === "no"
+        ? "not_applicable"
+        : choseLater ? "will_confirm_later" : hasTime ? "entered" : "not_provided";
+      sendToGoogleSheet({
+        sessionId,
+        response: attendance,
+        arrivalTime: attendance === "yes" && hasTime ? arrivalTime.value : "",
+        timeStatus,
+        submittedAt: new Date().toISOString()
+      });
     }
 
     // Navigation event listeners
     document.getElementById('yes-button').addEventListener('click', () => showStep(1));
-    document.getElementById('join-after-reassurance').addEventListener('click', () => showStep(2));
+    document.getElementById('join-after-reassurance').addEventListener('click', () => {
+      attendance = "yes";
+      showStep(2);
+    });
     
     document.getElementById('time-next').addEventListener('click', () => {
-      sendToGoogleSheet({
-        event: "time_selected",
-        time: arrivalTime.value || null,
-        choseLater: choseLater
-      });
+      if (!arrivalTime.value && !choseLater) {
+        timeError.hidden = false;
+        arrivalTime.focus();
+        return;
+      }
+      saveResponse();
       showStep(3);
     });
 
@@ -326,39 +377,17 @@
       button.addEventListener('click', () => showStep(Number(button.dataset.next)));
     });
 
-    arrivalTime.addEventListener('input', () => { choseLater = false; });
+    arrivalTime.addEventListener('input', () => {
+      choseLater = false;
+      laterButton.classList.remove('selected');
+      timeError.hidden = true;
+    });
     
-    document.getElementById('later-button').addEventListener('click', () => {
+    laterButton.addEventListener('click', () => {
       choseLater = true;
       arrivalTime.value = '';
-      sendToGoogleSheet({
-        event: "time_selected",
-        time: null,
-        choseLater: true
-      });
-      showStep(3);
-    });
-
-    // "No" button playful movement
-    const noButton = document.getElementById('no-button');
-    const noZone = document.getElementById('no-zone');
-    const noHint = document.getElementById('no-hint');
-    let noCount = 0;
-    const noLabels = ['Wait, reconsider? 😅','One little twirl?','Catch me first!','Just one dance?','Still floating away!'];
-    
-    noButton.addEventListener('click', () => {
-      noCount += 1;
-      if (noCount >= 3) {
-        showStep(1);
-        return;
-      }
-      const maxX = Math.max(0, noZone.clientWidth - noButton.offsetWidth);
-      const maxY = Math.max(0, noZone.clientHeight - noButton.offsetHeight);
-      noButton.style.transform = 'none';
-      noButton.style.left = `${Math.random() * maxX}px`;
-      noButton.style.top = `${Math.random() * maxY}px`;
-      noButton.textContent = noLabels[(noCount - 1) % noLabels.length];
-      noHint.textContent = 'The “No” button has a mind of its own…';
+      laterButton.classList.add('selected');
+      timeError.hidden = true;
     });
 
     // Response Modal & Confetti
@@ -390,13 +419,6 @@
       responseFrom = kind;
       const isPass = kind === 'pass';
       
-      // Send Google Sheet event if opted out on Step 2
-      if (isPass) {
-        sendToGoogleSheet({
-          event: "pass"
-        });
-      }
-
       responseTitle.textContent = isPass ? 'Thanks for letting me know' : 'You just made my night!';
       responseCopy.textContent = isPass ? 'No pressure at all. I hope you have a lovely night, and there’s no need to explain. 💛' : 'Now counting down to our Garba date. ✨';
       responseIcon.textContent = isPass ? '💛' : '💖';
@@ -413,7 +435,11 @@
     }
 
     finish.addEventListener('click', () => openResponse('finish'));
-    passButton.addEventListener('click', () => openResponse('pass'));
+    passButton.addEventListener('click', () => {
+      attendance = "no";
+      saveResponse();
+      openResponse('pass');
+    });
     document.getElementById('close-response').addEventListener('click', closeResponse);
     response.addEventListener('click', event => { if (event.target === response) closeResponse(); });
     document.addEventListener('keydown', event => { if (event.key === 'Escape' && response.classList.contains('show')) closeResponse(); });
