@@ -1,7 +1,7 @@
 const RESPONSES_TAB_NAME = "RSVP Responses";
 const RESPONSE_HEADERS = [
   "Received at",
-  "Session ID",
+  "Submission ID",
   "Page 2 response",
   "Page 3 arrival time",
   "Page 3 time choice",
@@ -22,7 +22,7 @@ function doGet() {
 }
 
 /**
- * Accepts one RSVP submission and upserts it by browser session ID.
+ * Saves one RSVP per submission ID, appending a new row for each new ID.
  * Requests are sent as text/plain JSON to avoid a browser CORS preflight.
  */
 function doPost(e) {
@@ -32,10 +32,10 @@ function doPost(e) {
 
     const payload = JSON.parse(contents);
     const response = String(payload.response || "").trim().toLowerCase();
-    const sessionId = safeText_(payload.sessionId, 100);
+    const submissionId = safeText_(payload.submissionId || payload.sessionId, 100);
 
-    if (!sessionId || (response !== "yes" && response !== "no")) {
-      return json_({ ok: false, error: "A session ID and Yes/No RSVP are required." });
+    if (!submissionId || (response !== "yes" && response !== "no")) {
+      return json_({ ok: false, error: "A submission ID and Yes/No RSVP are required." });
     }
 
     let arrivalTime = "";
@@ -56,7 +56,7 @@ function doPost(e) {
     const sentAt = safeText_(payload.submittedAt, 40);
     const row = [
       new Date(),
-      sessionId,
+      submissionId,
       response === "yes" ? "Yes" : "No",
       arrivalTime,
       timeChoice,
@@ -73,7 +73,7 @@ function doPost(e) {
       let matchingRow = 0;
       if (lastRow > 1) {
         const ids = sheet.getRange(2, 2, lastRow - 1, 1).getDisplayValues();
-        const index = ids.findIndex(item => item[0] === sessionId);
+        const index = ids.findIndex(item => item[0] === submissionId);
         if (index >= 0) matchingRow = index + 2;
       }
 
@@ -125,3 +125,5 @@ function json_(value) {
     .createTextOutput(JSON.stringify(value))
     .setMimeType(ContentService.MimeType.JSON);
 }
+
+
